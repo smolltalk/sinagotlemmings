@@ -76,7 +76,7 @@ void mousePressed() {
     
     
     nb_entrance++;
-    lemmingList.add(new Lemming(animSet, landscape, ((int) random(28,31)) * 40 + 20, 0, nb_entrance, type));
+    lemmingList.add(new Lemming(animSet, landscape, ((int) random(1,31)) * 40 + 20, 0, nb_entrance, type));
     type = (type+1) % frequency;
   
 } else if (mouseButton == RIGHT) {
