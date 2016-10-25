@@ -226,6 +226,10 @@ class Lemming {
     return (xpos < 0 || ypos > height); 
   }  
   
+  boolean isDying(){
+    return (behaviour == LemmingBehaviour.DIE);
+  }
+  
   void die(){
     xpos = killXPos - ((int) godPirouette);
     ypos = killYPos + ((int) ((godPirouette - 110) * (godPirouette - 110) / 100) - 120) ; 

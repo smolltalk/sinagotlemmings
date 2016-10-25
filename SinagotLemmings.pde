@@ -82,8 +82,15 @@ void mousePressed() {
 } else if (mouseButton == RIGHT) {
 
     if (!lemmingList.isEmpty()){
-      nb_exit++;
-      lemmingList.get(0).kill();
+      for (Iterator<Lemming> iterator = lemmingList.iterator (); iterator.hasNext(); ) {
+        Lemming lemming = iterator.next();
+        if (!lemming.isDying()){
+          lemming.kill();
+          nb_exit++;
+          break;
+        }
+      }
+      
     }
   }
   
