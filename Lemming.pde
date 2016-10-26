@@ -19,7 +19,8 @@ class Lemming {
   LemmingAnimation currentAnim;
   int frame;
   int timeFalling = 0;
-
+  int timeGettingUp = 0;
+  
   // Entrance Counter Marks
   int nb_entrance;
   int type;
@@ -75,6 +76,8 @@ class Lemming {
                   break;
       case CLIMB : climb();
                    break;
+      case GET_UP : getUp();
+                   break;             
       case DIE : die();
                 break;
     }
@@ -204,8 +207,7 @@ class Lemming {
     }
     // Is free
     if (landscape.isWalkFree(xpos + xDirection * getWidth() / 2,  ypos)){      
-      xpos = xpos + xDirection * getWidth() / 2;
-      initWalk();
+      initGetUp();
       return;
     }
     
@@ -213,6 +215,28 @@ class Lemming {
     ypos += yDirection  * 2;
   }
 
+  void initGetUp(){
+    behaviour = LemmingBehaviour.GET_UP;
+    currentAnim = selectXDirectionAnimation(animSet.GET_UP_R, animSet.GET_UP_L);
+    frame = 0;
+    timeGettingUp = 0;
+    if (xDirection < 0){
+      xpos = (((int) (xpos / 40)) * 40);
+    }else{
+      xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) + 7;
+    }
+  }
+  
+  void getUp(){
+    // After one loop
+    if (timeGettingUp == 7){
+      xpos = xpos + xDirection * getWidth() / 2;
+      initWalk();
+      return;
+    }
+    timeGettingUp ++;
+  }
+  
   void kill(){
     behaviour = LemmingBehaviour.DIE;
     currentAnim = selectXDirectionAnimation(animSet.FALL_R, animSet.FALL_L);

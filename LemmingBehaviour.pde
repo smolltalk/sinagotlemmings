@@ -3,5 +3,6 @@ enum LemmingBehaviour {
   READ,
   FALL,
   CLIMB,
+  GET_UP,
   DIE
 }
