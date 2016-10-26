@@ -25,14 +25,49 @@ class Landscape {
 
     images = new PImage[9];
     images[0] = null; // reserved for later background
-    images[1] = loadImage("A.gif");
-    images[2] = loadImage("B.gif");
-    images[3] = loadImage("C.gif");
-    images[4] = loadImage("D.gif");
-    images[5] = loadImage("E.gif");
+    images[1] = loadImage("A.gif"); // bord droit
+    images[2] = loadImage("B.gif"); // entoure
+    images[3] = loadImage("C.gif"); // bord gauche
+    images[4] = loadImage("D.gif"); // isole
+    images[5] = loadImage("E.gif"); // coeur
     images[6] = loadImage("arbre_01.png");
     images[7] = loadImage("arbre_02.png");
     images[8] = loadImage("arbre_03.png");
+    
+    generateLandscape();
+  }
+
+  void generateLandscape() {
+    for (int y = 0; y < objects.length - 1; y ++)
+      for (int x = 0; x < objects[0].length; x++)
+      {
+        if (objects[y][x] == 0) {
+          continue;
+        }
+        boolean top = (y > 0 && objects[y - 1][x] > 0);
+        // boolean bottom = (y < objects.length - 1 && objects[y + 1][x] > 1) || y == objects.length - 1;
+        boolean left = (x > 0 && objects[y][x - 1] > 0) || x == 0;
+        boolean right = (x < (objects[y].length - 1) && objects[y][x + 1] > 0) || x == (objects[y].length - 1);
+
+        if (top) {
+          // coeur
+          objects[y][x] = 5;
+        } else {
+          if (left && right) {
+            // entoure
+            objects[y][x] = 2;
+          } else if (left) {
+            // bord droit
+            objects[y][x] = 3;
+          } else if (right) {
+            // bord gauche
+            objects[y][x] = 1;
+          } else {
+            // isolee
+            objects[y][x] = 4;
+          }
+        }
+      }
   }
 
   void display() {
@@ -42,39 +77,25 @@ class Landscape {
     for (int y = 0; y < objects.length; y ++)
       for (int x = 0; x < objects[0].length; x++)
       {
-
-
-        if ((y-1 >= 0) && (y+1 < objects.length) && (x-1 >= 0) && (x+1 < objects[0].length)) {
-
-          if ((objects[y][x] == 1) && (objects[y-1][x] == 0) && (objects[y][x-1] == 0) && (objects[y][x+1] == 0)) {
-            image(images[4], x * 40, y * 40); //plateforme isolée
-          } else if ((objects[y][x] == 1) && (objects[y-1][x] == 0) && (objects[y][x+1] == 0) && (objects[y][x-1] == 1)) {
-            image(images[3], x * 40, y * 40); //bord droit
-          } else if ((objects[y][x] == 1) && (objects[y-1][x] == 0) && (objects[y][x+1] == 1) && (objects[y][x-1] == 0)) {
-            image(images[1], x * 40, y * 40); //bord gauche
-          } else if ((objects[y][x] == 1) && (objects[y-1][x] == 0) && (objects[y][x+1] == 1) && (objects[y][x-1] == 1)) {
-            image(images[2], x * 40, y * 40); //plateforme entourée
-            r = (r+1) % treeObject.length;
-            switch (treeObject[r]) {
-            case 1: 
-              image(images[6], x * 40, y * 40-images[6].height);//rajout d'arbre
-              break;
-            case 2: 
-              image(images[7], x * 40, y * 40-images[7].height);//rajout d'arbre
-              break;
-            case 3: 
-              image(images[8], x * 40, y * 40-images[8].height);//rajout d'arbre
-              break;
-            case 4: //rien!
-              break;
-            default:
-              break;
-            }
-          } else if ((objects[y][x] == 1) && (objects[y-1][x] == 1)) {
-            image(images[5], x * 40, y * 40); //cœur de plateforme
+        int imageType = objects[y][x];
+        switch(imageType) {
+        case 0:
+          continue;
+        case 2:
+          r = (r+1) % treeObject.length;
+          int to = treeObject[r]; 
+          switch (to) {
+          case 1: 
+          case 2: 
+          case 3: 
+            image(images[to + 5], x * 40, y * 40-images[to + 5].height);//rajout d'arbre
+            break;
+          default:
+            break;
           }
-        } else if (objects[y][x] == 1) {
-          image(images[2], x * 40, y * 40); //si je suis su rmes bords de tableau
+          // No break to run default
+        default :
+          image(images[imageType], x * 40, y * 40);
         }
       }
   }
