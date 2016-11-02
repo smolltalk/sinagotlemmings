@@ -260,7 +260,7 @@ class Lemming {
     if (xDirection < 0) {
       xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) - 4;
     } else {
-      xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) + 7;
+      xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) + 8;
     }
   }
 
@@ -287,7 +287,7 @@ class Lemming {
     currentAnim = selectXDirectionAnimation(animSet.GET_UP_R, animSet.GET_UP_L);
     frame = 0;
     time = 0;
-    ypos -= 4;
+    ypos -= 2;
     if (xDirection < 0) {
       xpos = (((int) (xpos / 40)) * 40);
     } else {
