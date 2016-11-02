@@ -113,7 +113,7 @@ class Lemming {
     if (landscapeCollision || ((xDirection == -1) && xpos < getWidth() / 2) || (xDirection == 1 && xpos > width-(getWidth() / 2))){
       // Bing! A wall or a screen edge => Change direction
       // Am I a climber (type == 4) hurting a wall?
-      if (landscapeCollision && type == 4){
+      if (landscapeCollision ){// && type == 4){
         initClimb();
       }else{
         collisionCounter ++;      
@@ -223,7 +223,7 @@ class Lemming {
     if (xDirection < 0){
       xpos = (((int) (xpos / 40)) * 40);
     }else{
-      xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) + 7;
+      xpos = ((((int) (xpos / 40)) +1) * 40);// + (getWidth() / 2) + 7;
     }
   }
   
