@@ -18,30 +18,28 @@ class Lemming {
   // Frame
   LemmingAnimation currentAnim;
   int frame;
-  int timeFalling = 0;
-  int timeGettingUp = 0;
-  
+  int time = 0;
+
   // Entrance Counter Marks
   int nb_entrance;
   int type;
 
   LemmingBehaviour behaviour;
-  
+
   // Wall Counter & Reading Time
   int wallCounter = 0;
-  int readingTime = 0;
   int wallCounterDelay = 0;
   int changeTypeCounter = 0;
 
   // Collision, CollisionReactionDelay, ReadingDuration
   int collisionCounter;
   int collisionReactionDelay;
-  int readingDuration;
+  int behaviourDuration;
 
   // Killing effect
   int killXPos;
   int killYPos;
-  
+
   Lemming(LemmingAnimationSet animSet, Landscape landscape, int xpos, int ypos, int nb_entrance, int type) {
     this.animSet = animSet;
     this.landscape = landscape;
@@ -66,58 +64,70 @@ class Lemming {
     display_new();
   }
 
-  void display_new(){
-    switch(behaviour){
-      case WALK : walk();
-                  break;
-      case READ : read();
-                  break;
-      case FALL : fall();
-                  break;
-      case CLIMB : climb();
-                   break;
-      case GET_UP : getUp();
-                   break;             
-      case DIE : die();
-                break;
+  void display_new() {
+    switch(behaviour) {
+    case WALK : 
+      walk();
+      break;
+    case SHRUG : 
+      shrug();
+      break;
+    case READ :
+      read();
+      break;
+    case DANCE :
+      dance();
+      break;
+    case FALL : 
+      fall();
+      break;
+    case CLIMB : 
+      climb();
+      break;
+    case GET_UP : 
+      getUp();
+      break;             
+    case DIE : 
+      die();
+      break;
     }
-    
+
     // Display animation
     frame = currentAnim.display(frame, xpos - getWidth() / 2, ypos - getHeight() / 2);
-    
+
     // Display ID Lemmings
     textSize(13);
     text(nb_entrance, xpos, ypos-(getHeight()/2)-20);
   }
 
-  void initWalk(){
+  void initWalk() {
     behaviour = LemmingBehaviour.WALK;
     currentAnim = selectXDirectionAnimation(animSet.RIGHT, animSet.LEFT);
     collisionCounter = 0;
     collisionReactionDelay = 0;
-    readingDuration = 0;
+    behaviourDuration = 0;
     frame = 0;
     // Align ypos on grid to avoid walking bogged down in wall
     ypos = (((int) (ypos / 40)) * 40) + (getHeight() / 2);
   }
-  
-  void walk(){
+
+  void walk() {
     // Empty under feets
-    if (landscape.isWalkFree(xpos,  ypos + getHeight() / 2) && landscape.isWalkFree((xpos - 12 * xDirection),  ypos + getHeight() / 2)){
+    if (landscape.isWalkFree(xpos, ypos + getHeight() / 2) && landscape.isWalkFree((xpos - 12 * xDirection), ypos + getHeight() / 2)) {
       // Nothing under feets => start falling
       initFall();
       return;
     }
     // Landscape collision or screen collision
-    boolean landscapeCollision = !landscape.isWalkFree(xpos + xDirection * getWidth() / 2,  ypos); 
-    if (landscapeCollision || ((xDirection == -1) && xpos < getWidth() / 2) || (xDirection == 1 && xpos > width-(getWidth() / 2))){
+    boolean landscapeCollision = !landscape.isWalkFree(xpos + xDirection * getWidth() / 2, ypos); 
+    if (landscapeCollision || ((xDirection == -1) && xpos < getWidth() / 2) || (xDirection == 1 && xpos > width-(getWidth() / 2))) {
       // Bing! A wall or a screen edge => Change direction
       // Am I a climber (type == 4) hurting a wall?
-      if (landscapeCollision ){// && type == 4){
+      if (landscapeCollision && type == 4) {
         initClimb();
-      }else{
+      } else {
         collisionCounter ++;      
-        if (collisionCounter == 3){
+        if (collisionCounter == 3) {
           collisionReactionDelay = (int) random(5, 30);
         }
         xDirection = -1 * xDirection; 
@@ -126,10 +136,20 @@ class Lemming {
       return;
     }
     // Reaction after collision?    
-    if (collisionReactionDelay > 0){
+    if (collisionReactionDelay > 0) {
       collisionReactionDelay --;
-      if (collisionReactionDelay == 0){
-        initRead();
+      if (collisionReactionDelay == 0) {
+        switch((int) random(0, 3)) {
+        case 0 :
+          initShrug();
+          break;
+        case 1 :
+          initRead();
+          break;
+        default :
+          initDance();
+          break;
+        }
         return;
       }
     }
@@ -137,131 +157,177 @@ class Lemming {
     // Else walk
     xpos += xDirection * rateFactorX;
   }
-  
-  void initRead(){
-    behaviour = LemmingBehaviour.READ;
-    currentAnim = animSet.READ;
-    readingDuration = (int) random(10, 60);
+
+  void initShrug() {
+    behaviour = LemmingBehaviour.SHRUG;
+    currentAnim = animSet.SHRUG;
+    behaviourDuration = (int) random(10, 60);
     frame = 0;
   }
-  
-  void read(){
-    if (readingDuration == 0){
+
+  void shrug() {
+    if (behaviourDuration == 0) {
       initWalk();
       return;
     }
-    readingDuration --;
+    behaviourDuration --;
   }
-  
-  void initFall(){
+
+  void initRead() {
+    behaviour = LemmingBehaviour.READ;
+    currentAnim = selectXDirectionAnimation(animSet.READ_D_R, animSet.READ_D_L);
+    behaviourDuration = (int) random(10, 60);
+    time = 0;
+    frame = 0;
+  }
+
+  void read() {
+    if (behaviourDuration == 0) {
+      initWalk();
+      return;
+    }
+    behaviourDuration --;
+    switch(time) {
+    case 6 :
+      currentAnim = selectXDirectionAnimation(animSet.READ_R, animSet.READ_L);
+      frame = 0;
+      break;
+    }
+    time ++;
+  }
+
+  void initDance() {
+    behaviour = LemmingBehaviour.DANCE;
+    currentAnim = selectXDirectionAnimation(animSet.DANCE_D_R, animSet.DANCE_D_L);
+    behaviourDuration = (int) random(10, 60);
+    time = 0;
+    frame = 0;
+  }
+
+  void dance() {
+    if (behaviourDuration == 0) {
+      initWalk();
+      return;
+    }
+    behaviourDuration --;
+    switch(time) {
+    case 5 :
+      currentAnim = selectXDirectionAnimation(animSet.DANCE_R, animSet.DANCE_L);
+      frame = 0;
+      break;
+    }
+    time ++;
+  }
+
+
+  void initFall() {
     behaviour = LemmingBehaviour.FALL;
     yDirection = 1;
     rateFactorY = 10;
-    timeFalling = 0;
+    time = 0;
     currentAnim = selectXDirectionAnimation(animSet.FALL_R, animSet.FALL_L);
     frame = 0;
   }
-  
-  void fall(){
-    if (!landscape.isWalkFree(xpos,  ypos + getHeight() / 2)){
+
+  void fall() {
+    if (!landscape.isWalkFree(xpos, ypos + getHeight() / 2)) {
       // Hoho! I am feeling something => Start walking
       initWalk();
       return;
     }
     // Else fall
-    switch(timeFalling){
-      case 5 :
-        rateFactorY = 5;
-        currentAnim = selectXDirectionAnimation(animSet.PARA_D_R, animSet.PARA_D_L);
-        frame = 0;
-        break;
-      case 9 :
-        rateFactorY = 5;
-        currentAnim = selectXDirectionAnimation(animSet.PARA_R, animSet.PARA_L);
-        frame = 0;
-        break;
+    switch(time) {
+    case 5 :
+      rateFactorY = 5;
+      currentAnim = selectXDirectionAnimation(animSet.PARA_D_R, animSet.PARA_D_L);
+      frame = 0;
+      break;
+    case 9 :
+      rateFactorY = 5;
+      currentAnim = selectXDirectionAnimation(animSet.PARA_R, animSet.PARA_L);
+      frame = 0;
+      break;
     }
     ypos += yDirection * rateFactorY;
-    timeFalling ++;
+    time ++;
   }
-  
-  void initClimb(){
+
+  void initClimb() {
     behaviour = LemmingBehaviour.CLIMB;
     yDirection = -1;
     currentAnim = selectXDirectionAnimation(animSet.CLIMB_R, animSet.CLIMB_L);
     frame = 0;
-    if (xDirection < 0){
+    if (xDirection < 0) {
       xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) - 4;
-    }else{
+    } else {
       xpos = (((int) (xpos / 40)) * 40) + (getWidth() / 2) + 7;
     }
   }
-  
-  void climb(){
+
+  void climb() {
     // Is my head hurting something?
-    if (!landscape.isWalkFree(xpos,  ypos + (getHeight() / 2) * yDirection) || ypos < getHeight() / 2){
+    if (!landscape.isWalkFree(xpos, ypos + (getHeight() / 2) * yDirection) || ypos < getHeight() / 2) {
       // Change direction and fall
       xDirection = -1 * xDirection;
       initFall();
       return;
     }
     // Is free
-    if (landscape.isWalkFree(xpos + xDirection * getWidth() / 2,  ypos)){      
+    if (landscape.isWalkFree(xpos + xDirection * getWidth() / 2, ypos)) {      
       initGetUp();
       return;
     }
-    
+
     // Else climb
     ypos += yDirection  * 2;
   }
 
-  void initGetUp(){
+  void initGetUp() {
     behaviour = LemmingBehaviour.GET_UP;
     currentAnim = selectXDirectionAnimation(animSet.GET_UP_R, animSet.GET_UP_L);
     frame = 0;
-    timeGettingUp = 0;
-    if (xDirection < 0){
+    time = 0;
+    if (xDirection < 0) {
       xpos = (((int) (xpos / 40)) * 40);
-    }else{
-      xpos = ((((int) (xpos / 40)) +1) * 40);// + (getWidth() / 2) + 7;
+    } else {
+      xpos = ((((int) (xpos / 40)) +1) * 40);
     }
   }
-  
-  void getUp(){
+
+  void getUp() {
     // After one loop
-    if (timeGettingUp == 7){
+    if (time == 7) {
       xpos = xpos + xDirection * getWidth() / 2;
       initWalk();
       return;
     }
-    timeGettingUp ++;
+    time ++;
   }
-  
-  void kill(){
+
+  void kill() {
     behaviour = LemmingBehaviour.DIE;
     currentAnim = selectXDirectionAnimation(animSet.FALL_R, animSet.FALL_L);
     godPirouette = 0;
     killXPos = xpos;
     killYPos = ypos;
-    frame = 0;  
+    frame = 0;
   }
-  
-  boolean isDead(){
-    return (xpos < 0 || ypos > height); 
+
+  boolean isDead() {
+    return (xpos < 0 || ypos > height);
   }  
-  
-  boolean isDying(){
+
+  boolean isDying() {
     return (behaviour == LemmingBehaviour.DIE);
   }
-  
-  void die(){
+
+  void die() {
     xpos = killXPos - ((int) godPirouette);
     ypos = killYPos + ((int) ((godPirouette - 110) * (godPirouette - 110) / 100) - 120) ; 
     godPirouette += 10;
   }
-  
-  LemmingAnimation selectXDirectionAnimation(LemmingAnimation r, LemmingAnimation l){
+
+  LemmingAnimation selectXDirectionAnimation(LemmingAnimation r, LemmingAnimation l) {
     return xDirection == 1 ? r : l;
   }
-  
 }

@@ -12,5 +12,13 @@ class LemmingAnimationSet {
   LemmingAnimation CLIMB_L = new LemmingAnimation("cl", 8);
   LemmingAnimation GET_UP_R = new LemmingAnimation("cr_f_", 8);
   LemmingAnimation GET_UP_L = new LemmingAnimation("cl_f_", 8);
-  LemmingAnimation READ = new LemmingAnimation("a", 5);
+  LemmingAnimation SHRUG = new LemmingAnimation("a", 5);
+  LemmingAnimation READ_D_R = new LemmingAnimation("read_r_d", 5);
+  LemmingAnimation READ_D_L = new LemmingAnimation("read_l_d", 5);
+  LemmingAnimation READ_R = new LemmingAnimation("read_r", 8);
+  LemmingAnimation READ_L = new LemmingAnimation("read_l", 8);
+  LemmingAnimation DANCE_D_R = new LemmingAnimation("dance_r_d", 4);
+  LemmingAnimation DANCE_D_L = new LemmingAnimation("dance_l_d", 4);
+  LemmingAnimation DANCE_R = new LemmingAnimation("dance_r", 13);
+  LemmingAnimation DANCE_L = new LemmingAnimation("dance_l", 13);
 }
