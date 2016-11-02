@@ -122,8 +122,8 @@ class Lemming {
     boolean landscapeCollision = !landscape.isWalkFree(xpos + xDirection * getWidth() / 2, ypos); 
     if (landscapeCollision || ((xDirection == -1) && xpos < getWidth() / 2) || (xDirection == 1 && xpos > width-(getWidth() / 2))) {
       // Bing! A wall or a screen edge => Change direction
-      // Am I a climber (type == 4) hurting a wall?
-      if (landscapeCollision && type == 4) {
+      // Am I hurting a wall? If I get some luck (1/4), I will climb it!
+      if (landscapeCollision && ((int) random(0, 4) == 0)) {
         initClimb();
       } else {
         collisionCounter ++;      
